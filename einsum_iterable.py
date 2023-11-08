@@ -66,6 +66,9 @@ class multiTensor():
             return res
 
     def contraction(self, contra_ind):
+        # print(self.tensors,contra_ind)
+        if not contra_ind:
+            return self.element_product(self.index)
         res = [self]
         temp = []
         for ind in contra_ind:
@@ -127,7 +130,8 @@ def einsum(operation: str, *matrices) -> list:
     check(raw_product)
     raw_shape = raw_product.shape()
     shape = []
-    for dim, letter in zip(raw_shape, raw_product.index):
-        if letter in target:
-            shape += [dim]
+    for letter in target:
+        for dim, l in zip(raw_shape, raw_product.index):
+            if l == letter:
+                shape += [dim]
     return generating_matrix(raw_product, shape, target, summation)
