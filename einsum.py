@@ -119,12 +119,32 @@ def generating_matrix(t: multiTensor, out_shape: list, target: str, contra_lette
     return [generating_matrix(t, out_shape[1:], target, contra_letters, *position, [i]) for i in range(out_shape[0])]
 
 
+def check(t: multiTensor):
+    condition = True
+    shape = t.shape()
+    wrong_keys = []
+    for letter in set(t.index):
+        specific_shape = []
+        for i, s in zip(t.index, shape):
+            if i == letter:
+                specific_shape += [s]
+        if not max(specific_shape) == min(specific_shape):
+            wrong_keys += [letter]
+    if wrong_keys:
+        raise KeyError(f'Index not match the shape:{wrong_keys}')
+    if len(t.index)<len(shape):
+        raise KeyError('Missing index')
+    elif len(t.index)>len(shape):
+        raise KeyError('Extra index found')
+
+
 def einsum(operation: str, *matrices) -> list:
     operate, target, summation = classify(operation)
     raw_tensors = []
     for matrix in matrices:
         raw_tensors += [Tensor(mat=matrix)]
     raw_product = multiTensor(operate, *raw_tensors)
+    check(raw_product)
     raw_shape = raw_product.shape()
     shape = []
     for dim, letter in zip(raw_shape, raw_product.index):
@@ -133,7 +153,6 @@ def einsum(operation: str, *matrices) -> list:
         # print(shape,'shape')
     # print(operation,shape)
     return generating_matrix(raw_product, shape, target, summation)
-
 
 # def contraction(t: Tensor, contra_ind): # good
 #     res = [t]
