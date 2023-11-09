@@ -103,7 +103,9 @@ def generating_matrix(t: multiTensor, out_shape: list, target: str, contra_lette
     return [generating_matrix(t, out_shape[1:], target, contra_letters, *position, [i]) for i in range(out_shape[0])]
 
 
-def check(t: multiTensor):
+def check(t: multiTensor,target):
+    if not len(target) == len(set(target)):
+        raise KeyError('Duplicate output index')
     shape = t.shape()
     wrong_keys = []
     for letter in set(t.index):
@@ -127,7 +129,7 @@ def einsum(operation: str, *matrices) -> list:
     for matrix in matrices:
         raw_tensors += [Tensor(mat=matrix)]
     raw_product = multiTensor(operate, *raw_tensors)
-    check(raw_product)
+    check(raw_product, target)
     raw_shape = raw_product.shape()
     shape = []
     for letter in target:
