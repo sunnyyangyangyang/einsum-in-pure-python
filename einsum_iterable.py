@@ -134,4 +134,5 @@ def einsum(operation: str, *matrices) -> list:
         for dim, l in zip(raw_shape, raw_product.index):
             if l == letter:
                 shape += [dim]
+                break
     return generating_matrix(raw_product, shape, target, summation)
